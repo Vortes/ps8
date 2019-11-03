@@ -56,7 +56,7 @@ class ResistantVirus(SimpleVirus):
         returns: True if this virus instance is resistant to the drug, False
         otherwise.
         """
-        if self.resistances[drug] == True:
+        if self.resistances[drug]:
             return True
         else:
             return False
@@ -118,10 +118,25 @@ class ResistantVirus(SimpleVirus):
         NoChildException if this virus particle does not reproduce.
         """
         prob = random.random()
+        new_resistance = {}
 
         if self.isResistantToAll(activeDrugs):
             if prob < self.maxBirthProb * (1 - popDensity):
-                child = ResistantVirus(self.maxBirthProb, self.clearProp)
+                prob_for_offspring = 1 - self.mutProb
+                for drugs in self.resistances:
+                    if self.isResistantTo(self.resistances[drugs]):
+                        if prob < prob_for_offspring:
+                            new_resistance[drugs] = True
+                        else:
+                            new_resistance[drugs] = False
+                    else:
+                        if prob > prob_for_offspring:
+                            new_resistance[drugs] = True
+                        else:
+                            new_resistance[drugs] = False
+            else:
+                raise NoChildException()
+            child = ResistantVirus(self.maxBirthProb, new_resistance, self.clearProb. self.mutProb)
         else:
             raise NoChildException()
         
@@ -149,8 +164,13 @@ class Patient(SimplePatient):
 
         lossThreshold: Viral population size at which immune system is ineffective (an integer).
         """
-
-        # TODO
+        administeredDrugs = []
+        self.viruses = viruses
+        self.maxPop = maxPop
+        self.clearProb = clearProb
+        self.detectionThreshold = detectionThreshold
+        self.lossthreshold = lossThreshold
+        self.administeredDrugs = administeredDrugs
 
     def addPrescription(self, newDrug):
         """
@@ -162,8 +182,11 @@ class Patient(SimplePatient):
 
         postcondition: The list of drugs being administered to a patient is updated
         """
+        if newDrug in self.administeredDrugs:
+            pass
+        else:
+            self.administeredDrugs.append(newDrug)
 
-        # TODO
 
     def getPrescriptions(self):
         """
@@ -172,8 +195,8 @@ class Patient(SimplePatient):
         returns: The list of drug names (strings) being administered to this
         patient.
         """
-
-        # TODO
+        return self.administeredDrugs
+        
 
     def getResistPop(self, drugResist):
         """
