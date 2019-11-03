@@ -11,6 +11,14 @@ from ps7 import *
 #
 # PROBLEM 1
 #
+class NoChildException(Exception):
+    """
+    NoChildException is raised by the reproduce() method in the SimpleVirus
+    and ResistantVirus classes to indicate that a virus particle does not
+    reproduce. You can use NoChildException as is, you do not need to
+    modify/add any code.
+    """
+
 
 class ResistantVirus(SimpleVirus):
     """
@@ -33,7 +41,9 @@ class ResistantVirus(SimpleVirus):
         the probability of the offspring acquiring or losing resistance to a drug.
         """
 
-        # TODO
+        self.maxBirthProb = maxBirthProb
+        self.resistances = resistances
+        self.mutProb = mutProb
 
     def isResistantTo(self, drug):
         """
@@ -46,14 +56,23 @@ class ResistantVirus(SimpleVirus):
         returns: True if this virus instance is resistant to the drug, False
         otherwise.
         """
+        if self.resistances[drug] == True:
+            return True
+        else:
+            return False
 
-        # TODO
 
     def isResistantToAll(self, drugList):
         """ Helper function that checks if virus is resistant to all the drugs
             in drugList """
+        for drugs in range(len(drugList)):
+            if self.resistances[drugList[drugs]] == True:
+                continue
+            else:
+                return False
 
-        # TODO
+        return True
+        
 
     def reproduce(self, popDensity, activeDrugs):
         """
@@ -98,8 +117,14 @@ class ResistantVirus(SimpleVirus):
         maxBirthProb and clearProb values as this virus. Raises a
         NoChildException if this virus particle does not reproduce.
         """
+        prob = random.random()
 
-        # TODO
+        if self.isResistantToAll(activeDrugs):
+            if prob < self.maxBirthProb * (1 - popDensity):
+                child = ResistantVirus(self.maxBirthProb, self.clearProp)
+        else:
+            raise NoChildException()
+        
 
 class Patient(SimplePatient):
     """
