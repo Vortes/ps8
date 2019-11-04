@@ -45,6 +45,7 @@ class ResistantVirus(SimpleVirus):
         self.resistances = resistances
         self.mutProb = mutProb
 
+
     def isResistantTo(self, drug):
         """
         Get the state of this virus particle's resistance to a drug. This method
@@ -209,8 +210,14 @@ class Patient(SimplePatient):
         returns: The population of viruses (an integer) with resistances to all
         drugs in the drugResist list.
         """
+        super_drugs = 0
+        for drugs in drugResist:
+            if drugs.isResistantTo(drugs):
+                super_drugs += 1
+            else:
+                pass
+        return super_drugs
 
-        # TODO
 
     def update(self):
         """
@@ -231,8 +238,21 @@ class Patient(SimplePatient):
         returns: The total virus population at the end of the update (an
         integer)
         """
+        
+        for virus in self.viruses:
+            if virus.doesClear() == True:
+                self.viruses.remove(virus)
+            
+            current_pop_density = self.getTotalPop() / float(self.maxPop)
 
-        # TODO
+            if current_pop_density < 1 and current_pop_density > 0:
+                try:
+                    virus.reproduce(current_pop_density)
+                    self.viruses.append(virus)
+                except NoChildException:
+                    pass
+                
+        return self.getTotalPop()
 
 #
 # PROBLEM 2
@@ -257,7 +277,7 @@ def simulationWithDrug():
              (a float between 0-1).
     numTrials: number of simulation runs to execute (an integer)
     """
-
+    
     # TODO
 
 
